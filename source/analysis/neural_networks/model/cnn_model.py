@@ -9,17 +9,14 @@ from PIL import Image
 import time
 
 
-
-# CONFIGURATION
-
-
-# MODEL_PATH = os.path.join("Py","ML", "cnn_model.pth")
-# # MODEL_PATH = os.path.join("_mmmn","Py","ML", "cnn_model.pth")
-MODEL_PATH = os.path.join("Py","ML", "cnn_model.pth")
-IMAGE_SIZE = (244, 244)
-NUM_CLASSES = 3  
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+MODEL_DIR = os.path.dirname(BASE_DIR)
+TRAIN_DATA_DIR = os.path.join(MODEL_DIR, "train_data")
+MODEL_PATH = os.path.join(TRAIN_DATA_DIR, "cnn_model.pth")
+IMAGE_SIZE = (224, 224)
+NUM_CLASSES = 4  
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
-CLASS_NAMES = ["0", "1", "2"]  
+CLASS_NAMES = ["Original", "Deepfake", "Faceswap", "AI Content Insertion"]  
 
 
 def debug_log(msg):
@@ -49,15 +46,15 @@ class ResNetClassifier:
     def _load_model(self, mode):
         
 
-        model = models.resnet50(weights=None if mode == "fine_tuned" else models.ResNet50_Weights.IMAGENET1K_V1)
+        model = models.resnet50(weights=models.ResNet50_Weights.IMAGENET1K_V1)
         model.fc = torch.nn.Linear(model.fc.in_features, NUM_CLASSES)
 
         
-        if os.path.exists(MODEL_PATH):
+        if mode == "fine_tuned" and os.path.exists(MODEL_PATH):
             model.load_state_dict(torch.load(MODEL_PATH, map_location=DEVICE))
             debug_log(f"Loaded fine-tuned model from {MODEL_PATH}")
         else:
-            debug_log(f"[WARN] Fine-tuned model not found at {MODEL_PATH}. Using untrained weights.")
+            debug_log(f"Using pretrained ResNet50 weights.")
        
         return model
 

@@ -1,7 +1,7 @@
 import sys, json, os
 import numpy as np
 import pickle
-from core.decision_tree.RandomForest import RandomForest
+from source.analysis.neural_networks.model.RandomForest import RandomForest
 
 
 
@@ -9,8 +9,9 @@ class RFClassifier:
 
     LABELS = {
         0: "Original",
-        1: "Tampered",
-        2: "AI-generated"
+        3: "Deepfake",
+        1: "Faceswap",
+        2: "AI Content Insertion"
 
     }
 

@@ -7,15 +7,15 @@ from sklearn.metrics import confusion_matrix
 
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
-from RandomForest import RandomForest
+from source.analysis.neural_networks.RandomForest import RandomForest
 
 
 
 current_dir = os.path.dirname(__file__)
 root_dir = os.path.dirname(current_dir)
 
-EXTRACTED_DATA_PATH = os.path.join(current_dir, "features_dataset.xlsx")
-MODEL_PATH = os.path.join(root_dir, "rf_model.pkl")
+EXTRACTED_DATA_PATH = os.path.join(root_dir, "train_data", "features_dataset.xlsx")
+MODEL_PATH = os.path.join(root_dir, "train_data", "rf_model.pkl")
 
 
 

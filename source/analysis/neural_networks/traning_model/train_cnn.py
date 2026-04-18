@@ -10,24 +10,39 @@ from tqdm import tqdm
 import time
 
 
-# SETTING !
-DATA_DIR = "Cnn_datasets" 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-ML_DIR = os.path.dirname(BASE_DIR)
-SAVE_PATH = os.path.join(ML_DIR, "cnn_model.pth")
+MODEL_DIR = os.path.dirname(BASE_DIR)
+NEURAL_DIR = os.path.dirname(MODEL_DIR)
+ANALYSIS_DIR = os.path.dirname(NEURAL_DIR)
+SOURCE_DIR = os.path.dirname(ANALYSIS_DIR)
+PROJECT_ROOT = os.path.dirname(SOURCE_DIR)
+
+
+DATA_DIR = os.path.join(PROJECT_ROOT, "uploads_datasets")
+
+
+MODEL_DIR = os.path.join(MODEL_DIR, "train_data")
+SAVE_PATH = os.path.join(MODEL_DIR, "cnn_model.pth")
 
 
 BATCH_SIZE = 8
-NUM_CLASSES = 3
+NUM_CLASSES = 4
 EPOCHS = 5
 LEARNING_RATE = 1e-4
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
 
-# start loading data
+CLASS_LABELS = {
+    0: "Original",
+    1: "Deepfake",
+    2: "Faceswap", 
+    3: "AI Content Insertion"
+}
+
+
 def load_data():
     transform = transforms.Compose([
-        transforms.Resize((244, 244)),
+        transforms.Resize((224, 224)),
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.485, 0.456, 0.406],
                              std=[0.229, 0.224, 0.225]),
@@ -49,13 +64,20 @@ def load_data():
 
 def train_model():
 
+    # Ensure model directory exists
+    os.makedirs(MODEL_DIR, exist_ok=True)
+
     if os.path.exists(SAVE_PATH):
         print(f"[INFO] Existing model found at {SAVE_PATH}. Deleting old model...")
         os.remove(SAVE_PATH)
 
-
+    print(f"[INFO] Dataset path: {DATA_DIR}")
+    print(f"[INFO] Model will be saved to: {SAVE_PATH}")
 
     train_loader, val_loader, class_names = load_data()
+
+    print(f"[INFO] Expected classes: {list(CLASS_LABELS.values())}")
+    print(f"[INFO] Loaded classes: {class_names}")
 
     model = models.resnet50(weights=models.ResNet50_Weights.IMAGENET1K_V1)
     model.fc = nn.Linear(model.fc.in_features, NUM_CLASSES)
